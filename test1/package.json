@@ -1,0 +1,11 @@
+{
+  "name": "test1",
+  "version": "0.0.0",
+  "dependencies": {
+    "express": "~4.13.1",
+    "backbone": "*",
+    "jquery": "*",
+    "lodash": "*",
+    "socket.io": "*"
+  }
+}

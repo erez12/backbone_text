@@ -1,0 +1,93 @@
+<html>
+<head>
+
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  	<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+  	<style type="text/css">
+  		.head{
+  			background-color:orange;
+  		}
+  	</style>
+</head>
+
+<body>
+	<div class="container" style="width: 500px;padding-top: 50px">
+  		<form>
+		    <div class="form-group">
+		      <div class="input-group">
+		        <div class="input-group-addon"><i class="fa fa-search"></i></div>
+		        <input type="text" class="form-control" placeholder="Filter By Stock ID (use '-' for range and ',' as seperator)" id="filterById">
+		      </div>
+		    </div>
+	  	</form>
+	  	<table class="table table-striped table-bordered">
+		    <thead>
+		      <tr>
+		        <th class="head">Id</th>
+		        <th class="head">Name</th>
+		        <th class="head">Value</th>
+		      </tr>
+		    </thead>
+
+		    <tbody>
+		    	<tr>
+				    <td>111</td>
+				    <td>ggg</td>
+				    <td>123</td>
+				</tr>
+		    </tbody>
+	  	</table>
+	</div>
+</body>
+
+<script>
+
+  	app.controller('myCtrl', function($scope) {
+  		$scope.sortType = 'cmpId';
+		$scope.sortReverse = false;
+		$scope.searchCmpId = ''; // set the default search/filter term
+	  	$('#toggle-event').change(function() {
+	      	USD = $(this).prop('checked');
+	      	$scope.$apply(function() {
+		      	if (!USD){
+		      		$scope.data = getOldValues($scope.data)
+		      		delete $scope.data.__valueInUSD;
+		      		return
+		      	}
+
+	      		$scope.data = changeAmounts($scope.data)
+	       });
+	    });
+
+	  	$scope.tableFilter = function(item) {
+	  		if ($scope.searchCmpId == '')
+	  			return true;
+
+  			var a = !!$scope.searchCmpId.split(",").find(function (element, index, array){
+  				var range = element.split("-");
+  				if (range.length == 1){
+	  				return range.indexOf(item['cmpId'] + "") >= 0;
+	  			}
+
+	  			var low = range[0];
+	  			var high = range[1];
+	  			return ( parseInt(low) <= item['cmpId'] && item['cmpId'] <= parseInt(high) );
+  			});
+
+  			return a;
+	    }
+
+		var socket = io();
+	  	socket.on('new Data', function(msg){
+	    	$scope.$apply(function() {
+	            $scope.data = fixMessage(msg);
+	       });
+	  	});
+	});
+</script>
+</html>
